@@ -36,15 +36,15 @@ public class FolderListAdapter extends EasyLVAdapter<Folder> {
     @Override
     public void convert(EasyLVHolder holder, final int position, Folder folder) {
         if (position == 0) {
-            holder.setText(R.id.tvFolderName, "所有图片")
-                    .setText(R.id.tvImageNum, "共" + getTotalImageSize() + "张");
+            holder.setText(R.id.tvFolderName, mContext.getString(R.string.all_images))
+                    .setText(R.id.tvImageNum, String.valueOf(getTotalImageSize()));
             ImageView ivFolder = holder.getView(R.id.ivFolder);
             if (folderList.size() > 0) {
                 config.loader.displayImage(context, folder.cover.path, ivFolder);
             }
         } else {
             holder.setText(R.id.tvFolderName, folder.name)
-                    .setText(R.id.tvImageNum, "共" + folder.images.size() + "张");
+                    .setText(R.id.tvImageNum, String.valueOf(folder.images.size()));
             ImageView ivFolder = holder.getView(R.id.ivFolder);
             if (folderList.size() > 0) {
                 config.loader.displayImage(context, folder.cover.path, ivFolder);
