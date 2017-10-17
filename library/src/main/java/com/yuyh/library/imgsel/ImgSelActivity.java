@@ -3,10 +3,12 @@ package com.yuyh.library.imgsel;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.yuyh.library.imgsel.common.Callback;
 import com.yuyh.library.imgsel.common.Constant;
 import com.yuyh.library.imgsel.utils.FileUtils;
@@ -56,23 +59,11 @@ public class ImgSelActivity extends FragmentActivity implements View.OnClickList
 
     private ArrayList<String> result = new ArrayList<>();
 
-    public static void startActivity(Activity activity, ImgSelConfig config, int RequestCode) {
-        Intent intent = new Intent(activity, ImgSelActivity.class);
-        Constant.config = config;
-        activity.startActivityForResult(intent, RequestCode);
-    }
-
-    public static void startActivity(Fragment fragment, ImgSelConfig config, int RequestCode) {
-        Intent intent = new Intent(fragment.getActivity(), ImgSelActivity.class);
-        Constant.config = config;
-        fragment.startActivityForResult(intent, RequestCode);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_img_sel);
-        config = Constant.config;
+        config = getDefaultConfig(this);
 
         // Android 6.0 checkSelfPermission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -90,6 +81,46 @@ public class ImgSelActivity extends FragmentActivity implements View.OnClickList
         if (!FileUtils.isSdCardAvailable()) {
             Toast.makeText(this, getString(R.string.sd_disable), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public ImgSelConfig getDefaultConfig(Context context){
+        // 自定义图片加载器
+        ImageLoader loader = new ImageLoader() {
+            @Override
+            public void displayImage(Context context, String path, ImageView imageView) {
+                // TODO 在这边可以自定义图片加载库来加载ImageView，例如Glide、Picasso、ImageLoader等
+                Glide.with(context).load(path).into(imageView);
+            }
+        };
+        // 自由配置选项
+        ImgSelConfig config = new ImgSelConfig.Builder(context, loader)
+                // 是否多选, 默认true
+                .multiSelect(false)
+                // 是否记住上次选中记录, 仅当multiSelect为true的时候配置，默认为true
+                .rememberSelected(false)
+                // “确定”按钮背景色
+                .btnBgColor(Color.GRAY)
+                // “确定”按钮文字颜色
+                .btnTextColor(Color.BLUE)
+                // 使用沉浸式状态栏
+                .statusBarColor(getResources().getColor(R.color.colorPrimaryDark))
+                // 返回图标ResId
+                .backResId(R.drawable.ic_back)
+                // 标题
+                .title("Images")
+                // 标题文字颜色
+                .titleColor(Color.BLACK)
+                // TitleBar背景色
+                .titleBgColor(getResources().getColor(R.color.colorPrimary))
+                // 裁剪大小。needCrop为true的时候配置
+                .cropSize(1, 1, 200, 200)
+                .needCrop(false)
+                // 第一个是否显示相机，默认true
+                .needCamera(true)
+                // 最大选择图片数量，默认9
+                .maxNum(9)
+                .build();
+        return config;
     }
 
     private void initView() {
@@ -287,6 +318,5 @@ public class ImgSelActivity extends FragmentActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Constant.config = null;
     }
 }

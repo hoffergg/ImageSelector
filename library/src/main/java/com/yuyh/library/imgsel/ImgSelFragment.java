@@ -100,11 +100,15 @@ public class ImgSelFragment extends Fragment implements View.OnClickListener, Vi
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        config = getDefaultConfig(getActivity());
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        config = Constant.config;
-        if(config == null)
-            config = getDefaultConfig(getActivity());
+        config = getDefaultConfig(getActivity());
         try {
             callback = (Callback) getActivity();
         } catch (Exception e) {
