@@ -59,12 +59,25 @@ public class ImgSelActivity extends FragmentActivity implements View.OnClickList
 
     private ArrayList<String> result = new ArrayList<>();
 
+    public static void startActivity(Activity activity, ImgSelConfig config, int RequestCode) {
+        Intent intent = new Intent(activity, ImgSelActivity.class);
+        Constant.config = config;
+        activity.startActivityForResult(intent, RequestCode);
+    }
+
+    public static void startActivity(Fragment fragment, ImgSelConfig config, int RequestCode) {
+        Intent intent = new Intent(fragment.getActivity(), ImgSelActivity.class);
+        Constant.config = config;
+        fragment.startActivityForResult(intent, RequestCode);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_img_sel);
-        config = getDefaultConfig(this);
-
+        config = Constant.config;
+        if(config == null)
+            config = getDefaultConfig(this);
         // Android 6.0 checkSelfPermission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -318,5 +331,6 @@ public class ImgSelActivity extends FragmentActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Constant.config = null;
     }
 }
